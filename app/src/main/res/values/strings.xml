@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">MapsApp</string>
+    <string name="API_KEY">AIzaSyDt2lGbWyNZBlz27Km27s-zxFaj7tSt99c</string>
+    <string name="SERVER_KEY">AIzaSyAUKO7lwuAxErXoSOLhNB2xGYPuIXIG3cU</string>
+    <string name="btn_geocoder">Geocoder</string>
+    <string name="et_location">Location</string>
+</resources>

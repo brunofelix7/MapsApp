@@ -81,6 +81,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private List<Polyline> polylinePaths = new ArrayList<>();
     private ProgressDialog progressDialog;
 
+    private static final String LOG_TAG = "DirectionsTest";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -97,14 +99,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             enableButtons();
         }
 
-        sendRequest();
-
     }
 
     @Override
     public void onDirectionStart(){
-        progressDialog = ProgressDialog.show(this, "Please wait.",
-                "Finding direction..!", true);
+        //progressDialog = ProgressDialog.show(this, "Please wait.", "Finding direction..!", true);
         if (originMarkers != null){
             for(Marker marker: originMarkers){
                 marker.remove();
@@ -126,24 +125,15 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     @Override
     public void onDirectionSuccess(List<Route> routes){
-        progressDialog.dismiss();
+        //progressDialog.dismiss();
         polylinePaths = new ArrayList<>();
         originMarkers = new ArrayList<>();
         destinationMarkers = new ArrayList<>();
 
         for (Route route: routes) {
             googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(route.startLocation, 16));
-            Log.d("Directions", "Tempo: "     + route.duration.text);
-            Log.d("Directions", "Distância: " + route.distance.text);
-
-            /*originMarkers.add(googleMap.addMarker(new MarkerOptions()
-                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
-                    .title(route.startAddress)
-                    .position(route.startLocation)));
-            destinationMarkers.add(googleMap.addMarker(new MarkerOptions()
-                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
-                    .title(route.endAddress)
-                    .position(route.endLocation)));*/
+            Log.d(LOG_TAG, "Tempo: "     + route.duration.text);
+            Log.d(LOG_TAG, "Distância: " + route.distance.text);
 
             PolylineOptions polylineOptions = new PolylineOptions().
                     geodesic(true).
@@ -157,9 +147,16 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
-    private void sendRequest(){
-        String origin       = "-7.17981936,-34.89062548";
-        String destination  = "-7.18424222,-34.89023387";
+    /**
+     *
+     * @param originLat         Minha latitude
+     * @param originLng         Minha longitude
+     * @param destinationLat    Veículo latitude
+     * @param destinationLng    Veículo longitude
+     */
+    private void sendRequest(double originLat, double originLng, double destinationLat, double destinationLng){
+        String origin       = originLat + "," + originLng;
+        String destination  = destinationLat + "," + destinationLng;
         try{
             new DirectionsAPI(this, origin, destination).execute();
         }catch (UnsupportedEncodingException e) {
@@ -170,10 +167,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     protected void onResume() {
         super.onResume();
-        if(broadcastReceiver == null){
+        /*if(broadcastReceiver == null){
             broadcastReceiver = new BroadcastReceiver() {
                 @Override
                 public void onReceive(Context context, Intent intent) {
+                    //  AQUI EU RECEBO A LATITUDE E LONGITUDE DO VEÍCULO
                     LatLng latLng = new LatLng(intent.getExtras().getDouble(EXTRAS_KEY_LATITUDE), intent.getExtras().getDouble(EXTRAS_KEY_LONGITUDE));
                     MarkerOptions options = new MarkerOptions();
                     options.position(latLng);
@@ -187,7 +185,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 }
             };
         }
-        registerReceiver(broadcastReceiver, new IntentFilter("location_update"));
+        registerReceiver(broadcastReceiver, new IntentFilter("location_update"));*/
     }
 
     @Override
@@ -436,11 +434,35 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         if(location == null){
             Toast.makeText(this, "Can't get current location", Toast.LENGTH_LONG).show();
         }else{
-            double latitude = location.getLatitude();
-            double longitude = location.getLongitude();
+            final double latitude = location.getLatitude();
+            final double longitude = location.getLongitude();
             LatLng latLng = new LatLng(latitude, longitude);
 
-            goTolocation(latitude, longitude, 16);
+            //  CHAMAR O BROADCAST AQUI E PEGAR O LAT E LNG
+            if(broadcastReceiver == null){
+                broadcastReceiver = new BroadcastReceiver() {
+                    @Override
+                    public void onReceive(Context context, Intent intent) {
+                        //  AQUI EU RECEBO A LATITUDE E LONGITUDE DO VEÍCULO
+                        LatLng latLng = new LatLng(intent.getExtras().getDouble(EXTRAS_KEY_LATITUDE), intent.getExtras().getDouble(EXTRAS_KEY_LONGITUDE));
+                        MarkerOptions options = new MarkerOptions();
+                        options.position(latLng);
+                        options.icon(BitmapDescriptorFactory.fromResource(R.drawable.marker_vehicle2));
+                        googleMap.addMarker(options);
+                        double latService = intent.getExtras().getDouble(EXTRAS_KEY_LATITUDE);
+                        double lngService = intent.getExtras().getDouble(EXTRAS_KEY_LONGITUDE);
+
+                        Log.d(LOG_TAG, "Lat: " + latitude);
+                        Log.d(LOG_TAG, "Lng: " + longitude);
+                        Log.d(LOG_TAG, "LatService: " + latService);
+                        Log.d(LOG_TAG, "LngService: " + lngService);
+                        //sendRequest(latitude, longitude, intent.getExtras().getDouble(EXTRAS_KEY_LATITUDE), intent.getExtras().getDouble(EXTRAS_KEY_LONGITUDE));
+                    }
+                };
+            }
+            registerReceiver(broadcastReceiver, new IntentFilter("location_update"));
+
+            goTolocation(latitude, longitude, 15);
 
             //  COLOCAR EM UM MÉTODO
             try{
@@ -456,6 +478,5 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         }
     }
-
 
 }

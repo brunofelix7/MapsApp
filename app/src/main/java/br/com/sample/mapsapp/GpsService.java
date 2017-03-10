@@ -40,8 +40,8 @@ public class GpsService extends Service {
                 //  ENVIA AS CORDENDAS VIA BROADCAST RECEIVE, ASSIM EU POSSO CAPTURAR OS DADOS NA MINHA MAIN ACTIVITY
                 //  ESTE É O LISTENER DA LOCALIZAÇÃO DA AMBULÂNCIA
                 //  POSSO FAZER UM setLatitude (Pegar da API)
-                double lat = -7.18424222;
-                double lng = -34.89023387;
+                double lat = -7.18086254;
+                double lng = -34.8876214;
                 location.setLatitude(lat);
                 location.setLongitude(lng);
                 Intent intent = new Intent("location_update");

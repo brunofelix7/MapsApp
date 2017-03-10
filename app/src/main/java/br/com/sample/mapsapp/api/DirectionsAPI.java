@@ -21,6 +21,12 @@ import br.com.sample.mapsapp.models.Route;
 
 public class DirectionsAPI {
 
+    //  https://developer.android.com/guide/topics/permissions/requesting.html
+    //  https://developer.android.com/training/permissions/requesting.html?hl=pt-br
+    //  https://github.com/miskoajkula/GPS_service
+    //  https://github.com/hiepxuan2008/GoogleMapDirectionSimple
+    //  https://github.com/akexorcist/Android-GoogleDirectionLibrary
+
     private static final String DIRECTION_API_URL = "https://maps.googleapis.com/maps/api/directions/json?";
     private static final String SERVER_KEY = "AIzaSyAUKO7lwuAxErXoSOLhNB2xGYPuIXIG3cU";
     private DirectionsAPIListener listener;

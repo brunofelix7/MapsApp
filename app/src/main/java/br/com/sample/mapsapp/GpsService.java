@@ -14,7 +14,6 @@ import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 
-
 public class GpsService extends Service {
 
     private LocationListener locationListener;
